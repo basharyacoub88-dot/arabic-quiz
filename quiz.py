@@ -2,8 +2,7 @@ import streamlit as st
 import time
 
 # -----------------------------
-# قائمة الأسئلة (10 أسئلة متنوعة)
-# -----------------------------
+# قائمة الأسئلة (10 أسئلة متنوعة)\# -----------------------------
 QUESTIONS = [
     {"id": 1, "question": "ما هو الكوكب الذي يُعرف بالكوكب الأحمر؟", "choices": ["الزهرة", "المريخ", "عطارد", "المشتري"], "answer": "المريخ", "explanation": "لونه الأحمر بسبب أكسيد الحديد."},
     {"id": 2, "question": "ما هو أسرع حيوان بري؟", "choices": ["الفهد", "الأسد", "الغزال", "الذئب"], "answer": "الفهد", "explanation": "تصل سرعته إلى 110 كم/ساعة."},
@@ -33,7 +32,7 @@ if not st.session_state.started:
 
     if st.button("🚀 ابدأ الاختبار", use_container_width=True):
         st.session_state.started = True
-        st.experimental_set_query_params(started="1")
+        st.session_state.start_time = time.time()
         st.rerun()
 
     st.stop()
@@ -42,7 +41,7 @@ if not st.session_state.started:
 st.markdown("""
 <style>
 @media (max-width: 600px) {
-    .block-container { padding-left: 10px !important; padding-right: 10px! important; }
+    .block-container { padding-left: 10px !important; padding-right: 10px !important; }
     h1, h2, h3 { text-align: center !important; font-size: 22px !important; }
     .stButton>button { width: 100% !important; font-size: 18px !important; padding: 10px; }
 }
@@ -54,18 +53,19 @@ if "q_index" not in st.session_state:
     st.session_state.q_index = 0
 if "score" not in st.session_state:
     st.session_state.score = 0
-if "start_time" not in st.session_state:
-    st.session_state.start_time = time.time()
 if "finished" not in st.session_state:
     st.session_state.finished = False
 
 # المؤقت
-TOTAL_TIME = 300
+TOTAL_TIME = 180
 elapsed = int(time.time() - st.session_state.start_time)
-time_left = max(0, TOTAL_TIME - elapsed)
+time_left = TOTAL_TIME - elapsed
 
-if time_left == 0:
+if time_left <= 0:
     st.session_state.finished = True
+
+# تحديث كل ثانية
+st.markdown("<meta http-equiv='refresh' content='1'>", unsafe_allow_html=True)
 
 # شريط التقدم
 progress = (st.session_state.q_index + 1) / len(QUESTIONS)
@@ -86,13 +86,6 @@ if st.session_state.finished or st.session_state.q_index >= len(QUESTIONS):
     st.markdown("## 🎉 انتهى الاختبار!")
     st.markdown(f"### نتيجتك النهائية: **{st.session_state.score} / {len(QUESTIONS)}**")
 
-    if st.session_state.score == len(QUESTIONS):
-        st.success("🎯 ممتاز! إجاباتك كلها صحيحة!")
-    elif st.session_state.score >= len(QUESTIONS) / 2:
-        st.info("🙂 أداء جيد، استمر!")
-    else:
-        st.error("😕 تحتاج المزيد من التدريب.")
-
     if st.button("🔄 إعادة المحاولة", use_container_width=True):
         st.session_state.q_index = 0
         st.session_state.score = 0
@@ -102,8 +95,15 @@ if st.session_state.finished or st.session_state.q_index >= len(QUESTIONS):
 
     st.stop()
 
-# عرض السؤال الحالي
-question = QUESTIONS[st.session_state.q_index]
-st.markdown(f"## ❓ {question['question']}")
+# عرض السؤال
+q = QUESTIONS[st.session_state.q_index]
+st.markdown(f"## ❓ {q['question']}")
 
-choice = st.radio("اختر الإجابة:", question["choices"])
+choice = st.radio("اختر الإجابة:", q["choices"])
+
+if st.button("التالي ➡", use_container_width=True):
+    if choice == q["answer"]:
+        st.session_state.score += 1
+
+    st.session_state.q_index += 1
+    st.rerun()
