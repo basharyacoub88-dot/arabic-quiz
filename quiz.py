@@ -33,7 +33,8 @@ if not st.session_state.started:
 
     if st.button("🚀 ابدأ الاختبار", use_container_width=True):
         st.session_state.started = True
-        st.rerun()
+        st.experimental_set_query_params(started="1")
+        st.rerun()()
 
     st.stop()
 
@@ -81,32 +82,7 @@ st.markdown(f"""
 <p style='text-align:center; font-size:16px; margin-top:5px;'>السؤال {st.session_state.q_index + 1} من {len(QUESTIONS)}</p>
 """, unsafe_allow_html=True)
 
-# مؤقت دائري
-st.markdown(
-    """
-    <div style='display:flex; justify-content:center; margin-top:10px;'>
-        <div style='
-            width:120px;
-            height:120px;
-            border-radius:50%;
-            border:10px solid #ddd;
-            border-top-color:#4CAF50;
-            animation: spin 1s linear infinite;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            font-size:22px;
-            font-weight:bold;
-            color:#333;'>
-                TIMELEFT_REPLACE
-        </div>
-    </div>
-    <style>
-    @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-    </style>
+<!-- المؤقت الدائري تم إلغاؤه بناءً على طلب المستخدم -->
     """.replace("TIMELEFT_REPLACE", str(time_left)),
     unsafe_allow_html=True,
 )
