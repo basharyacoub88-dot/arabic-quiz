@@ -1,0 +1,142 @@
+import streamlit as st
+import time
+
+# -----------------------------
+# قائمة الأسئلة (10 أسئلة متنوعة)
+# -----------------------------
+QUESTIONS = [
+    {
+        "id": 1,
+        "question": "ما هو الكوكب الذي يُعرف بالكوكب الأحمر؟",
+        "choices": ["الزهرة", "المريخ", "عطارد", "المشتري"],
+        "answer": "المريخ",
+        "explanation": "لونه الأحمر بسبب أكسيد الحديد."
+    },
+    {
+        "id": 2,
+        "question": "ما هو أسرع حيوان بري؟",
+        "choices": ["الفهد", "الأسد", "الغزال", "الذئب"],
+        "answer": "الفهد",
+        "explanation": "تصل سرعته إلى 110 كم/ساعة."
+    },
+    {
+        "id": 3,
+        "question": "في أي قارة يقع نهر الأمازون؟",
+        "choices": ["أفريقيا", "آسيا", "أمريكا الجنوبية", "أوروبا"],
+        "answer": "أمريكا الجنوبية",
+        "explanation": "يعد من أطول أنهار العالم."
+    },
+    {
+        "id": 4,
+        "question": "كم عدد أركان الإسلام؟",
+        "choices": ["3", "4", "5", "6"],
+        "answer": "5",
+        "explanation": "الشهادتان، الصلاة، الزكاة، الصوم، الحج."
+    },
+    {
+        "id": 5,
+        "question": "ما هي الدولة العربية الأكبر مساحة؟",
+        "choices": ["السعودية", "الجزائر", "السودان", "مصر"],
+        "answer": "الجزائر",
+        "explanation": "مساحتها 2.38 مليون كم²."
+    },
+    {
+        "id": 6,
+        "question": "ما هي اللغة الأكثر انتشاراً في العالم؟",
+        "choices": ["الإنجليزية", "العربية", "الإسبانية", "الصينية"],
+        "answer": "الصينية",
+        "explanation": "لغة الماندرين يتحدث بها أكثر من مليار شخص."
+    },
+    {
+        "id": 7,
+        "question": "كم يساوي مجموع زوايا المثلث؟",
+        "choices": ["120", "360", "90", "180"],
+        "answer": "180",
+        "explanation": "قانون ثابت في الهندسة."
+    },
+    {
+        "id": 8,
+        "question": "من هو مؤسس علم الجبر؟",
+        "choices": ["الخوارزمي", "ابن سينا", "ابن الهيثم", "ابن رشد"],
+        "answer": "الخوارزمي",
+        "explanation": "له كتاب 'الجبر والمقابلة'."
+    },
+    {
+        "id": 9,
+        "question": "من هو أول من مشى على سطح القمر؟",
+        "choices": ["نيل آرمسترونغ", "يوري غاغارين", "مايكل كولينز", "ألدرين"],
+        "answer": "نيل آرمسترونغ",
+        "explanation": "كان ذلك عام 1969."
+    },
+    {
+        "id": 10,
+        "question": "ما هي أكبر قارات العالم؟",
+        "choices": ["أفريقيا", "آسيا", "أوروبا", "أمريكا الشمالية"],
+        "answer": "آسيا",
+        "explanation": "مساحتها 44.5 مليون كم²."
+    }
+]
+
+# إعداد الصفحة
+st.set_page_config(page_title="اختبار الثقافة العامة", layout="centered")
+
+# تخزين الجلسة
+if "q_index" not in st.session_state:
+    st.session_state.q_index = 0
+if "score" not in st.session_state:
+    st.session_state.score = 0
+if "start_time" not in st.session_state:
+    st.session_state.start_time = time.time()
+if "finished" not in st.session_state:
+    st.session_state.finished = False
+
+# مؤقت
+TOTAL_TIME = 180  # 3 دقائق
+elapsed = int(time.time() - st.session_state.start_time)
+time_left = TOTAL_TIME - elapsed
+
+if time_left <= 0:
+    st.session_state.finished = True
+
+# واجهة جانبية
+st.markdown("## ⭐ واجهة الاختبار
+---")
+st.sidebar.success(f"⏳ الوقت المتبقي: {time_left//60:02d}:{time_left%60:02d}")
+st.sidebar.info(f"📊 السؤال: {st.session_state.q_index + 1} / {len(QUESTIONS)}")
+st.sidebar.warning(f"⭐ نتيجتك: {st.session_state.score}")
+
+# إذا انتهى الاختبار
+if st.session_state.finished or st.session_state.q_index >= len(QUESTIONS):
+    st.markdown("## 🎉 انتهى الاختبار!")
+    st.markdown(f"### نتيجتك النهائية: **{st.session_state.score} / {len(QUESTIONS)}**")
+
+    if st.session_state.score == len(QUESTIONS):
+        st.success("🎯 ممتاز! إجاباتك كلها صحيحة!")
+    elif st.session_state.score >= len(QUESTIONS) / 2:
+        st.info("🙂 أداء جيد، استمر!")
+    else:
+        st.error("😕 تحتاج المزيد من التدريب.")
+
+    st.stop()
+
+# عرض السؤال الحالي
+q = QUESTIONS[st.session_state.q_index]
+st.markdown(f"## ❓ السؤال {st.session_state.q_index + 1}
+---") {st.session_state.q_index + 1}
+---")
+st.markdown(f"### {q['question']}")
+
+choice = st.radio("اختر إجابتك:", q["choices"])
+
+if st.button("تأكيد الإجابة", use_container_width=True):
+    if choice == q["answer"]:
+        st.success("✔️ إجابة صحيحة!")
+        st.session_state.score += 1
+    else:
+        st.error(f"❌ خاطئة! الإجابة الصحيحة هي: **{q['answer']}**")
+
+    st.info(q["explanation"])
+
+    st.session_state.q_index += 1
+    time.sleep(1)
+    st.experimental_rerun()
