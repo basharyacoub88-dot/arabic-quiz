@@ -1,8 +1,9 @@
-import streamlit as st
 import time
+import threading
 
 # -----------------------------
-# قائمة الأسئلة (10 أسئلة متنوعة)\# -----------------------------
+# قائمة الأسئلة (10 أسئلة متنوعة)
+# -----------------------------
 QUESTIONS = [
     {"id": 1, "question": "ما هو الكوكب الذي يُعرف بالكوكب الأحمر؟", "choices": ["الزهرة", "المريخ", "عطارد", "المشتري"], "answer": "المريخ", "explanation": "لونه الأحمر بسبب أكسيد الحديد."},
     {"id": 2, "question": "ما هو أسرع حيوان بري؟", "choices": ["الفهد", "الأسد", "الغزال", "الذئب"], "answer": "الفهد", "explanation": "تصل سرعته إلى 110 كم/ساعة."},
@@ -16,94 +17,60 @@ QUESTIONS = [
     {"id": 10, "question": "ما هي أكبر قارات العالم؟", "choices": ["أفريقيا", "آسيا", "أوروبا", "أمريكا الشمالية"], "answer": "آسيا", "explanation": "مساحتها 44.5 مليون كم²."}
 ]
 
-st.set_page_config(page_title="اختبار الثقافة العامة", layout="centered")
+TOTAL_TIME = 180  # 3 دقائق
+remaining_time = TOTAL_TIME
+stop_timer = False
 
-# صفحة البداية
-if "started" not in st.session_state:
-    st.session_state.started = False
+def timer():
+    global remaining_time, stop_timer
+    while remaining_time > 0 and not stop_timer:
+        time.sleep(1)
+        remaining_time -= 1
 
-if not st.session_state.started:
-    st.markdown("""
-        <div style='text-align:center; margin-top:40px;'>
-            <h1 style='font-size:36px;'>📘 اختبار الثقافة العامة</h1>
-            <p style='font-size:20px; color:#555;'>اختبار ممتع مكوّن من 10 أسئلة متنوعة</p>
-        </div>
-    """, unsafe_allow_html=True)
+# بدء المؤقت في خيط منفصل
+t = threading.Thread(target=timer)
+t.start()
 
-    if st.button("🚀 ابدأ الاختبار", use_container_width=True):
-        st.session_state.started = True
-        st.session_state.start_time = time.time()
-        st.rerun()
+score = 0
 
-    st.stop()
+print("\n=============================")
+print("📘 اختبار الثقافة العامة — وضع سطر الأوامر")
+print("=============================\n")
 
-# دعم الهواتف
-st.markdown("""
-<style>
-@media (max-width: 600px) {
-    .block-container { padding-left: 10px !important; padding-right: 10px !important; }
-    h1, h2, h3 { text-align: center !important; font-size: 22px !important; }
-    .stButton>button { width: 100% !important; font-size: 18px !important; padding: 10px; }
-}
-</style>
-""", unsafe_allow_html=True)
+for q in QUESTIONS:
+    print(f"⏳ الوقت المتبقي: {remaining_time//60:02d}:{remaining_time%60:02d}")
+    print(f"\n❓ السؤال {q['id']}: {q['question']}")
 
-# حالة الجلسة
-if "q_index" not in st.session_state:
-    st.session_state.q_index = 0
-if "score" not in st.session_state:
-    st.session_state.score = 0
-if "finished" not in st.session_state:
-    st.session_state.finished = False
+    for i, choice in enumerate(q['choices'], start=1):
+        print(f"  {i}. {choice}")
 
-# المؤقت
-TOTAL_TIME = 180
-elapsed = int(time.time() - st.session_state.start_time)
-time_left = TOTAL_TIME - elapsed
+    while True:
+        try:
+            user_input = int(input("\nاختر رقم الإجابة: "))
+            if 1 <= user_input <= len(q['choices']):
+                break
+            else:
+                print("❗ اختر رقمًا صحيحًا من القائمة.")
+        except ValueError:
+            print("❗ أدخل رقمًا فقط.")
 
-if time_left <= 0:
-    st.session_state.finished = True
+    if remaining_time <= 0:
+        print("\n⛔ انتهى الوقت!")
+        break
 
-# تحديث كل ثانية
-st.markdown("<meta http-equiv='refresh' content='1'>", unsafe_allow_html=True)
+    if q['choices'][user_input - 1] == q['answer']:
+        print("✔ إجابة صحيحة!\n")
+        score += 1
+    else:
+        print(f"✘ إجابة خاطئة! الإجابة الصحيحة هي: {q['answer']}\n")
 
-# شريط التقدم
-progress = (st.session_state.q_index + 1) / len(QUESTIONS)
+    if remaining_time <= 0:
+        print("\n⛔ انتهى الوقت!")
+        break
 
-st.markdown(f"""
-<div style='width:100%; background:#e0e0e0; border-radius:25px; height:18px;'>
-  <div style='width:{progress*100}%; height:100%; background:linear-gradient(90deg, #4CAF50, #2E7D32); border-radius:25px;'></div>
-</div>
-<p style='text-align:center; font-size:16px; margin-top:5px;'>السؤال {st.session_state.q_index + 1} من {len(QUESTIONS)}</p>
-""", unsafe_allow_html=True)
+stop_timer = True
 
-st.sidebar.success(f"⏳ الوقت المتبقي: {time_left//60:02d}:{time_left%60:02d}")
-st.sidebar.info(f"📊 السؤال: {st.session_state.q_index + 1} / {len(QUESTIONS)}")
-st.sidebar.warning(f"⭐ نتيجتك: {st.session_state.score}")
-
-# انتهاء الاختبار
-if st.session_state.finished or st.session_state.q_index >= len(QUESTIONS):
-    st.markdown("## 🎉 انتهى الاختبار!")
-    st.markdown(f"### نتيجتك النهائية: **{st.session_state.score} / {len(QUESTIONS)}**")
-
-    if st.button("🔄 إعادة المحاولة", use_container_width=True):
-        st.session_state.q_index = 0
-        st.session_state.score = 0
-        st.session_state.start_time = time.time()
-        st.session_state.finished = False
-        st.rerun()
-
-    st.stop()
-
-# عرض السؤال
-q = QUESTIONS[st.session_state.q_index]
-st.markdown(f"## ❓ {q['question']}")
-
-choice = st.radio("اختر الإجابة:", q["choices"])
-
-if st.button("التالي ➡", use_container_width=True):
-    if choice == q["answer"]:
-        st.session_state.score += 1
-
-    st.session_state.q_index += 1
-    st.rerun()
+print("=============================")
+print("🎉 انتهى الاختبار!")
+print(f"⭐ نتيجتك: {score} / {len(QUESTIONS)}")
+print("=============================")
