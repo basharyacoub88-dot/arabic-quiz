@@ -1,4 +1,3 @@
-# تم إصلاح خطأ السطر غير المكتمل
 import streamlit as st
 import time
 
@@ -78,7 +77,8 @@ QUESTIONS = [
     }
 ]
 
-# إعداد الصفحة
+st.set_page_config(page_title="اختبار الثقافة العامة", layout="centered")
+
 # صفحة البداية
 if "started" not in st.session_state:
     st.session_state.started = False
@@ -96,21 +96,19 @@ if not st.session_state.started:
         st.rerun()
 
     st.stop()
-st.set_page_config(page_title="اختبار الثقافة العامة", layout="centered")
 
-# دعم كامل للهواتف (Responsive CSS)
+# دعم الهواتف
 st.markdown("""
 <style>
-@media (max-width: 600px) {{
-    .block-container {{ padding-left: 10px !important; padding-right: 10px !important; }}
-    h1, h2, h3 {{ text-align: center !important; font-size: 22px !important; }}
-    .css-1cpxqw2 {{ width: 100% !important; }}
-    .stButton>button {{ width: 100% !important; font-size: 18px !important; padding: 10px; }}
-}}
+@media (max-width: 600px) {
+    .block-container { padding-left: 10px !important; padding-right: 10px !important; }
+    h1, h2, h3 { text-align: center !important; font-size: 22px !important; }
+    .stButton>button { width: 100% !important; font-size: 18px !important; padding: 10px; }
+}
 </style>
 """, unsafe_allow_html=True)
 
-# تخزين الجلسة
+# حالة الجلسة
 if "q_index" not in st.session_state:
     st.session_state.q_index = 0
 if "score" not in st.session_state:
@@ -120,20 +118,18 @@ if "start_time" not in st.session_state:
 if "finished" not in st.session_state:
     st.session_state.finished = False
 
-# مؤقت
-st_autorefresh = st.experimental_rerun if False else None  # placeholder
-total_time = 180  # 3 دقائق
+# المؤقت
+total_time = 180
 elapsed = int(time.time() - st.session_state.start_time)
-# تحديث الوقت تلقائيًا كل ثانية
 st.autorefresh(interval=1000, key="refresh")
-time_left = total_time - elapsed
 
+time_left = total_time - elapsed
 if time_left <= 0:
     st.session_state.finished = True
 
-# واجهة جانبية
+# تقدم الأسئلة
+progress = (st.session_state.q_index + 1) / len(QUESTIONS)
 
-# شريط تقدم احترافي
 st.markdown(f"""
 <div style='width:100%; background:#e0e0e0; border-radius:25px; height:18px;'>
   <div style='width:{progress*100}%; height:100%; background:linear-gradient(90deg, #4CAF50, #2E7D32); border-radius:25px;'></div>
@@ -141,36 +137,9 @@ st.markdown(f"""
 <p style='text-align:center; font-size:16px; margin-top:5px;'>السؤال {st.session_state.q_index + 1} من {len(QUESTIONS)}</p>
 """, unsafe_allow_html=True)
 
-# مؤقت دائري احترافي
-st.markdown(f"""
-<div style='display:flex; justify-content:center; margin:20px 0;'>
-  <div style='position: relative; width: 160px; height: 160px;'>
-
-    <svg width='160' height='160'>
-      <circle cx='80' cy='80' r='70' stroke='#ddd' stroke-width='12' fill='none' />
-      <circle cx='80' cy='80' r='70' stroke='#4CAF50' stroke-width='12' fill='none'
-        stroke-dasharray='440'
-        stroke-dashoffset='{440 - (time_left / total_time) * 440}'
-        stroke-linecap='round'
-        style='transition: stroke-dashoffset 1s linear;' />
-    </svg>
-
-    <div style='
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      display: flex; justify-content: center; align-items: center;
-      font-size: 28px; font-weight: bold; color: #333;'>
-      {time_left}
-    </div>
-  </div>
-</div>
-""", unsafe_allow_html=True)
-# شريط التقدم
-progress = (st.session_state.q_index + 1) / len(QUESTIONS)
-st.progress(progress)
-
-# مؤقت دائري (HTML/CSS)
+# مؤقت دائري
 st.markdown(
-    f"""
+    """
     <div style='display:flex; justify-content:center; margin-top:10px;'>
         <div style='
             width:120px;
@@ -185,26 +154,24 @@ st.markdown(
             font-size:22px;
             font-weight:bold;
             color:#333;'>
-            {time_left}
+                TIMELEFT_REPLACE
         </div>
     </div>
     <style>
-    @keyframes spin {{
-        from {{ transform: rotate(0deg); }}
-        to {{ transform: rotate(360deg); }}
-    }}
+    @keyframes spin {
+        from { transform: rotate(0deg); }
         to { transform: rotate(360deg); }
     }
     </style>
-    """,
+    """.replace("TIMELEFT_REPLACE", str(time_left)),
     unsafe_allow_html=True
-) — تم إصلاح السطر هنا
-st.markdown("## ⭐ واجهة الاختبار\n---")
+)
+
 st.sidebar.success(f"⏳ الوقت المتبقي: {time_left//60:02d}:{time_left%60:02d}")
 st.sidebar.info(f"📊 السؤال: {st.session_state.q_index + 1} / {len(QUESTIONS)}")
 st.sidebar.warning(f"⭐ نتيجتك: {st.session_state.score}")
 
-# إذا انتهى الاختبار
+# انتهاء الاختبار
 if st.session_state.finished or st.session_state.q_index >= len(QUESTIONS):
     st.markdown("## 🎉 انتهى الاختبار!")
     st.markdown(f"### نتيجتك النهائية: **{st.session_state.score} / {len(QUESTIONS)}**")
@@ -216,29 +183,25 @@ if st.session_state.finished or st.session_state.q_index >= len(QUESTIONS):
     else:
         st.error("😕 تحتاج المزيد من التدريب.")
 
+    if st.button("🔄 إعادة المحاولة", use_container_width=True):
+        st.session_state.started = False
+        st.session_state.q_index = 0
+        st.session_state.score = 0
+        st.session_state.start_time = time.time()
+        st.session_state.finished = False
+        st.rerun()
+
     st.stop()
 
 # عرض السؤال الحالي
-q = QUESTIONS[st.session_state.q_index]
-st.markdown(f"## ❓ السؤال {st.session_state.q_index + 1}\n---")
-st.markdown(f"### {q['question']}")
+question = QUESTIONS[st.session_state.q_index]
+st.markdown(f"### ❓ {question['question']}")
 
-choice = st.radio("اختر إجابتك:", q["choices"])
+selected = st.radio("اختر الإجابة:", question["choices"], index=None)
 
-# زر الانتقال للسؤال التالي بدون إجابة
-if st.button("التالي ➜", use_container_width=True):
-    st.session_state.q_index += 1
-    st.rerun()
-
-if st.button("تأكيد الإجابة", use_container_width=True):
-    if choice == q["answer"]:
-        st.success("✔️ إجابة صحيحة!")
+if st.button("التالي ➡️", use_container_width=True):
+    if selected == question["answer"]:
         st.session_state.score += 1
-    else:
-        st.error(f"❌ خاطئة! الإجابة الصحيحة هي: **{q['answer']}**")
-
-    st.info(q["explanation"])
 
     st.session_state.q_index += 1
-    time.sleep(1)
     st.rerun()
