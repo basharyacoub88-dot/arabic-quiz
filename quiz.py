@@ -101,28 +101,12 @@ st.set_page_config(page_title="اختبار الثقافة العامة", layout
 # دعم كامل للهواتف (Responsive CSS)
 st.markdown("""
 <style>
-/* ضبط العرض للهواتف */
-@media (max-width: 600px) {
-    .block-container {
-        padding-left: 10px !important;
-        padding-right: 10px !important;
-    }
-
-    h1, h2, h3 {
-        text-align: center !important;
-        font-size: 22px !important;
-    }
-
-    .css-1cpxqw2 {
-        width: 100% !important;
-    }
-
-    .stButton>button {
-        width: 100% !important;
-        font-size: 18px !important;
-        padding: 10px;
-    }
-}
+@media (max-width: 600px) {{
+    .block-container {{ padding-left: 10px !important; padding-right: 10px !important; }}
+    h1, h2, h3 {{ text-align: center !important; font-size: 22px !important; }}
+    .css-1cpxqw2 {{ width: 100% !important; }}
+    .stButton>button {{ width: 100% !important; font-size: 18px !important; padding: 10px; }}
+}}
 </style>
 """, unsafe_allow_html=True)
 
