@@ -1,3 +1,4 @@
+# تم إصلاح خطأ السطر غير المكتمل
 import streamlit as st
 import time
 
@@ -91,16 +92,15 @@ if "finished" not in st.session_state:
     st.session_state.finished = False
 
 # مؤقت
-TOTAL_TIME = 180  # 3 دقائق
+total_time = 180  # 3 دقائق
 elapsed = int(time.time() - st.session_state.start_time)
-time_left = TOTAL_TIME - elapsed
+time_left = total_time - elapsed
 
 if time_left <= 0:
     st.session_state.finished = True
 
-# واجهة جانبية
-st.markdown("## ⭐ واجهة الاختبار
----")
+# واجهة جانبية — تم إصلاح السطر هنا
+st.markdown("## ⭐ واجهة الاختبار\n---")
 st.sidebar.success(f"⏳ الوقت المتبقي: {time_left//60:02d}:{time_left%60:02d}")
 st.sidebar.info(f"📊 السؤال: {st.session_state.q_index + 1} / {len(QUESTIONS)}")
 st.sidebar.warning(f"⭐ نتيجتك: {st.session_state.score}")
@@ -121,9 +121,7 @@ if st.session_state.finished or st.session_state.q_index >= len(QUESTIONS):
 
 # عرض السؤال الحالي
 q = QUESTIONS[st.session_state.q_index]
-st.markdown(f"## ❓ السؤال {st.session_state.q_index + 1}
----") {st.session_state.q_index + 1}
----")
+st.markdown(f"## ❓ السؤال {st.session_state.q_index + 1}\n---")
 st.markdown(f"### {q['question']}")
 
 choice = st.radio("اختر إجابتك:", q["choices"])
