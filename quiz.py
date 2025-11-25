@@ -34,7 +34,7 @@ if not st.session_state.started:
     if st.button("🚀 ابدأ الاختبار", use_container_width=True):
         st.session_state.started = True
         st.experimental_set_query_params(started="1")
-        st.rerun()()
+        st.rerun()
 
     st.stop()
 
@@ -42,7 +42,7 @@ if not st.session_state.started:
 st.markdown("""
 <style>
 @media (max-width: 600px) {
-    .block-container { padding-left: 10px !important; padding-right: 10px !important; }
+    .block-container { padding-left: 10px !important; padding-right: 10px! important; }
     h1, h2, h3 { text-align: center !important; font-size: 22px !important; }
     .stButton>button { width: 100% !important; font-size: 18px !important; padding: 10px; }
 }
@@ -60,16 +60,11 @@ if "finished" not in st.session_state:
     st.session_state.finished = False
 
 # المؤقت
-TOTAL_TIME = 180
+TOTAL_TIME = 300
 elapsed = int(time.time() - st.session_state.start_time)
+time_left = max(0, TOTAL_TIME - elapsed)
 
-# تحديث كل ثانية
-st.markdown("""
-<meta http-equiv="refresh" content="1">
-""", unsafe_allow_html=True)
-
-time_left = TOTAL_TIME - elapsed
-if time_left <= 0:
+if time_left == 0:
     st.session_state.finished = True
 
 # شريط التقدم
@@ -81,11 +76,6 @@ st.markdown(f"""
 </div>
 <p style='text-align:center; font-size:16px; margin-top:5px;'>السؤال {st.session_state.q_index + 1} من {len(QUESTIONS)}</p>
 """, unsafe_allow_html=True)
-
-<!-- المؤقت الدائري تم إلغاؤه بناءً على طلب المستخدم -->
-    """.replace("TIMELEFT_REPLACE", str(time_left)),
-    unsafe_allow_html=True,
-)
 
 st.sidebar.success(f"⏳ الوقت المتبقي: {time_left//60:02d}:{time_left%60:02d}")
 st.sidebar.info(f"📊 السؤال: {st.session_state.q_index + 1} / {len(QUESTIONS)}")
