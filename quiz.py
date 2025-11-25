@@ -33,7 +33,7 @@ if not st.session_state.started:
 
     if st.button("🚀 ابدأ الاختبار", use_container_width=True):
         st.session_state.started = True
-        st.experimental_rerun()
+        st.rerun()
 
     st.stop()
 
@@ -132,7 +132,7 @@ if st.session_state.finished or st.session_state.q_index >= len(QUESTIONS):
         st.session_state.score = 0
         st.session_state.start_time = time.time()
         st.session_state.finished = False
-        st.experimental_rerun()
+        st.rerun()
 
     st.stop()
 
